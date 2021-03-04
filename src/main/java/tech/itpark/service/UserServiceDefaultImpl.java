@@ -40,7 +40,7 @@ public class UserServiceDefaultImpl implements UserService {
         OffsetDateTime.now().toEpochSecond() // long -> кол-во секунд с 1970 года 1 янв 00:00 по UTC
     ));
 
-    return modelByEntity(entity);
+    return userModelByEntity(entity);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class UserServiceDefaultImpl implements UserService {
       throw new PasswordInvalidException();
     }
 
-    return modelByEntity(entity);
+    return userModelByEntity(entity);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class UserServiceDefaultImpl implements UserService {
 
     entity.setPassword(model.getNewPassword());
 
-    return modelByEntity(entity);
+    return userModelByEntity(entity);
   }
 
   @Override
@@ -99,7 +99,7 @@ public class UserServiceDefaultImpl implements UserService {
     return true;
   }
 
-  private UserModel modelByEntity(UserEntity entity){
+  private UserModel userModelByEntity(UserEntity entity){
     UserModel result = null;
     if (entity!=null){
       result = new UserModel(
