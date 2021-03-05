@@ -78,19 +78,22 @@ public class UserRepositoryJDBCImpl implements UserRepository {
   }
 
   @Override
-  public Optional<UserEntity> findById(Long aLong) {
-    if (aLong.longValue() == 0){
+  public Optional<UserEntity> findById(Long id) {
+    if (id.longValue() == 0){
       return Optional.empty();
     }
     String queryString = "SELECT id, login, password, name, secret, roles, EXTRACT(EPOCH FROM created) created, removed FROM users WHERE id = ?";
     try (
       PreparedStatement stmt = connection.prepareStatement(queryString);
     ) {
-      stmt.setLong(1, aLong);
-      ResultSet rs = stmt.executeQuery();
+      stmt.setLong(1, id);
       UserEntity entity = null;
-      if (rs.next()) {
-        entity = mapper.map(rs);
+      try(ResultSet rs = stmt.executeQuery();){
+        if (rs.next()) {
+          entity = mapper.map(rs);
+        }
+      }catch (SQLException e) {
+        throw new DataAccessException(e);
       }
       return Optional.ofNullable(entity);
     } catch (SQLException e) {
@@ -180,11 +183,14 @@ public class UserRepositoryJDBCImpl implements UserRepository {
        PreparedStatement stmt = connection.prepareStatement(queryString);
     ) {
       stmt.setString(1, loginParam);
-      ResultSet rs = stmt.executeQuery();
       UserEntity entity = null;
-      if (rs.next()) {
-        entity = mapper.map(rs);
-      }
+      try(ResultSet rs = stmt.executeQuery();){
+        if (rs.next()) {
+          entity = mapper.map(rs);
+        }
+      }catch (SQLException e){
+        throw new DataAccessException(e);
+      };
       return Optional.ofNullable(entity);
     } catch (SQLException e) {
       throw new DataAccessException(e);
