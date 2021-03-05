@@ -101,7 +101,7 @@ public class UserRepositoryJDBCImpl implements UserRepository {
   @Override
   public UserEntity save(UserEntity entity) {
     if (entity == null){
-      return null;
+      throw new IllegalArgumentException("Argument is empty");
     }
     boolean insertUpdate = findById(entity.getId()).isEmpty();
 
