@@ -28,7 +28,7 @@ public class UserRepositoryInMemoryImpl implements UserRepository {
       entity.setId(nextId++);
     }
     // FIXME: check if user didn't change login
-    loginToEntity.put(entity.getLogin(), entity);
+    loginToEntity.put(entity.getLogin().trim().toLowerCase(), entity);
     return idToEntity.put(entity.getId(), entity);
   }
 
@@ -51,6 +51,6 @@ public class UserRepositoryInMemoryImpl implements UserRepository {
 
   @Override
   public Optional<UserEntity> findByLogin(String login) {
-    return Optional.ofNullable(loginToEntity.get(login));
+    return Optional.ofNullable(loginToEntity.get(login.trim().toLowerCase()));
   }
 }
