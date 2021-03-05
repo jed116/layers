@@ -138,8 +138,8 @@ public class UserRepositoryJDBCImpl implements UserRepository {
   }
 
   @Override
-  public boolean removeById(Long aLong) {
-    Optional<UserEntity> entityOptional = findById(aLong);
+  public boolean removeById(Long id) {
+    Optional<UserEntity> entityOptional = findById(id);
     if(entityOptional.isEmpty()){
       return false;
     }
