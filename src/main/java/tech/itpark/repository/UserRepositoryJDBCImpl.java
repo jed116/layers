@@ -79,7 +79,7 @@ public class UserRepositoryJDBCImpl implements UserRepository {
 
   @Override
   public Optional<UserEntity> findById(Long id) {
-    if (id.longValue() == 0){
+    if (id == null || id == 0){
       return Optional.empty();
     }
     String queryString = "SELECT id, login, password, name, secret, roles, EXTRACT(EPOCH FROM created) created, removed FROM users WHERE id = ?";
@@ -142,26 +142,21 @@ public class UserRepositoryJDBCImpl implements UserRepository {
 
   @Override
   public boolean removeById(Long id) {
-    Optional<UserEntity> entityOptional = findById(id);
-    if(entityOptional.isEmpty()){
-      return false;
+    if(id == null || id == 0){
+      throw new IllegalArgumentException("Argument is empty");
     }
-    UserEntity entity = entityOptional.get();
-    String queryString = "UPDATE users SET login = ?, password = ?, name = ?, secret = ?, roles = ?, created = ?, removed = ? WHERE id = ?";
+    String queryString = "UPDATE users SET removed = TRUE WHERE id = ? "+
+      "RETURNING id, login, password, name, secret, roles, EXTRACT(EPOCH FROM created) created, removed";
     try (
-        PreparedStatement stmt = connection.prepareStatement(queryString);
+          PreparedStatement stmt = connection.prepareStatement(queryString);
     ) {
-      int index = 0;
-      stmt.setString(++index, entity.getLogin());
-      stmt.setString(++index, entity.getPassword());
-      stmt.setString(++index, entity.getName());
-      stmt.setString(++index, entity.getSecret());
-      stmt.setArray(++index,  connection.createArrayOf("TEXT", entity.getRoles().toArray()));
-      stmt.setTimestamp(++index, new Timestamp(entity.getCreated()) );
-      stmt.setBoolean(++index,true);
-      stmt.setLong(++index,   entity.getId());
-      stmt.execute();
-      return true;
+      stmt.setLong(1, id);
+      try(ResultSet rs = stmt.executeQuery()){
+        if(!rs.next()){
+          throw new DataAccessException("Empty result");
+        }
+        return mapper.map(rs).isRemoved();
+      }
     } catch (SQLException e) {
       throw new DataAccessException(e);
     }

@@ -51,6 +51,9 @@ public class UserRepositoryInMemoryImpl implements UserRepository {
 
   @Override
   public Optional<UserEntity> findByLogin(String login) {
+    if (login == null || login.length() == 0){
+      throw new IllegalArgumentException("Argument is empty");
+    }
     return Optional.ofNullable(loginToEntity.get(login.trim().toLowerCase()));
   }
 }
