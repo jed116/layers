@@ -87,15 +87,12 @@ public class UserRepositoryJDBCImpl implements UserRepository {
       PreparedStatement stmt = connection.prepareStatement(queryString);
     ) {
       stmt.setLong(1, id);
-      UserEntity entity = null;
       try(ResultSet rs = stmt.executeQuery();){
         if (rs.next()) {
-          entity = mapper.map(rs);
+          return Optional.ofNullable(mapper.map(rs));
         }
-      }catch (SQLException e) {
-        throw new DataAccessException(e);
       }
-      return Optional.ofNullable(entity);
+      return Optional.empty();
     } catch (SQLException e) {
       throw new DataAccessException(e);
     }
@@ -178,15 +175,12 @@ public class UserRepositoryJDBCImpl implements UserRepository {
        PreparedStatement stmt = connection.prepareStatement(queryString);
     ) {
       stmt.setString(1, loginParam);
-      UserEntity entity = null;
       try(ResultSet rs = stmt.executeQuery();){
         if (rs.next()) {
-          entity = mapper.map(rs);
+          return Optional.ofNullable(mapper.map(rs));
         }
-      }catch (SQLException e){
-        throw new DataAccessException(e);
-      };
-      return Optional.ofNullable(entity);
+      }
+      return Optional.empty();
     } catch (SQLException e) {
       throw new DataAccessException(e);
     }
